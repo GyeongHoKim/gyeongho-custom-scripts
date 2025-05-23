@@ -1,0 +1,29 @@
+name: Test PowerShell Scripts
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run PowerShell Tests
+        shell: pwsh
+        run: |
+          Write-Host "Running PowerShell script tests..." -ForegroundColor Yellow
+          .\test.ps1
+
+      - name: Check Test Results
+        shell: pwsh
+        run: |
+          if ($LASTEXITCODE -ne 0) {
+            Write-Error "Tests failed with exit code $LASTEXITCODE"
+            exit 1
+          }
+          Write-Host "All tests passed!" -ForegroundColor Green
+
