@@ -1,4 +1,5 @@
 # Simple test script
+$allTestsPassed = $true
 Write-Host "Simple Test - Loading scripts..." -ForegroundColor Yellow
 
 # 스크립트 로드
@@ -15,6 +16,7 @@ Write-Host "`nChecking available commands:" -ForegroundColor Yellow
     if (Get-Command $_ -ErrorAction SilentlyContinue) {
         Write-Host "  ✓ $_" -ForegroundColor Green
     } else {
+        $allTestsPassed = $false
         Write-Host "  ✗ $_" -ForegroundColor Red
     }
 }
@@ -32,9 +34,11 @@ try {
     if (Test-Path $testFile) {
         Write-Host "  ✓ touch: file created successfully" -ForegroundColor Green
     } else {
+        $allTestsPassed = $false
         Write-Host "  ✗ touch: file creation failed" -ForegroundColor Red
     }
 } catch {
+    $allTestsPassed = $false
     Write-Host "  ✗ touch: error occurred ($_)." -ForegroundColor Red
 }
 
@@ -47,9 +51,11 @@ try {
     if ($grepResult -like "*hello world*") {
         Write-Host "  ✓ grep: working properly" -ForegroundColor Green
     } else {
+        $allTestsPassed = $false
         Write-Host "  ✗ grep: unexpected result" -ForegroundColor Red
     }
 } catch {
+    $allTestsPassed = $false
     Write-Host "  ✗ grep: error occurred ($_)." -ForegroundColor Red
 }
 
@@ -59,9 +65,11 @@ try {
     if ($headResult -match "hello world") {
         Write-Host "  ✓ head: working properly" -ForegroundColor Green
     } else {
+        $allTestsPassed = $false
         Write-Host "  ✗ head: unexpected result" -ForegroundColor Red
     }
 } catch {
+    $allTestsPassed = $false
     Write-Host "  ✗ head: error occurred ($_)." -ForegroundColor Red
 }
 
@@ -71,9 +79,11 @@ try {
     if ($tailResult -match "second line") {
         Write-Host "  ✓ tail: working properly" -ForegroundColor Green
     } else {
+        $allTestsPassed = $false
         Write-Host "  ✗ tail: unexpected result" -ForegroundColor Red
     }
 } catch {
+    $allTestsPassed = $false
     Write-Host "  ✗ tail: error occurred ($_)." -ForegroundColor Red
 }
 
@@ -83,9 +93,11 @@ try {
     if ($duResult -match "testfile.txt") {
         Write-Host "  ✓ du: working properly" -ForegroundColor Green
     } else {
+        $allTestsPassed = $false
         Write-Host "  ✗ du: no result" -ForegroundColor Red
     }
 } catch {
+    $allTestsPassed = $false
     Write-Host "  ✗ du: error occurred ($_)." -ForegroundColor Red
 }
 
@@ -93,11 +105,19 @@ try {
 try {
     ln -s $testFile $testLink
     if (Test-Path $testLink) {
-        Write-Host "  ✓ ln: symbolic link created successfully" -ForegroundColor Green
+        $item = Get-Item $testLink -Force
+        if (($item.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
+            Write-Host "  ✓ ln: symbolic link created successfully and verified" -ForegroundColor Green
+        } else {
+            $allTestsPassed = $false
+            Write-Host "  ✗ ln: path created but is NOT a symbolic link" -ForegroundColor Red
+        }
     } else {
+        $allTestsPassed = $false
         Write-Host "  ✗ ln: symbolic link creation failed" -ForegroundColor Red
     }
 } catch {
+    $allTestsPassed = $false
     Write-Host "  ✗ ln: error occurred ($_)." -ForegroundColor Red
 }
 
@@ -107,9 +127,11 @@ try {
     if ($whichResult -like "*touch*") {
         Write-Host "  ✓ which: working properly ($whichResult)" -ForegroundColor Green
     } else {
+        $allTestsPassed = $false
         Write-Host "  ✗ which: no result" -ForegroundColor Red
     }
 } catch {
+    $allTestsPassed = $false
     Write-Host "  ✗ which: error occurred ($_)." -ForegroundColor Red
 }
 
@@ -119,13 +141,23 @@ try {
     if (-not (Test-Path $testFile)) {
         Write-Host "  ✓ rm: file deleted successfully" -ForegroundColor Green
     } else {
+        $allTestsPassed = $false
         Write-Host "  ✗ rm: file deletion failed" -ForegroundColor Red
     }
     if (Test-Path $testLink) { rm $testLink }
 } catch {
+    $allTestsPassed = $false
     Write-Host "  ✗ rm: error occurred ($_)." -ForegroundColor Red
 }
 
 Write-Host "`nCommand execution tests completed!" -ForegroundColor Green
 
 Write-Host "`nTest completed!" -ForegroundColor Green
+
+if ($allTestsPassed) {
+    Write-Host "Final status: All tests passed." -ForegroundColor Green
+    exit 0
+} else {
+    Write-Host "Final status: One or more tests failed." -ForegroundColor Red
+    exit 1
+}
