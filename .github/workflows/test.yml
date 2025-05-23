@@ -17,6 +17,7 @@ jobs:
         run: |
           Write-Host "Running PowerShell script tests..." -ForegroundColor Yellow
           .\test.ps1
+          Write-Host "test.ps1 finished. LASTEXITCODE: $LASTEXITCODE, Success ($?): $?"
 
       - name: Check Test Results
         shell: pwsh
