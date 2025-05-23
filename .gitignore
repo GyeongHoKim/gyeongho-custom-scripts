@@ -1,0 +1,33 @@
+# PowerShell
+*.ps1xml
+*.psc1
+*.psd1
+*.psm1
+*.pssc
+*.psrc
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Build
+/build/
+/dist/
+/out/
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
