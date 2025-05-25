@@ -12,10 +12,10 @@ A collection of custom scripts that allow you to use Unix-style commands in Wind
    irm get.scoop.sh | iex
    ```
 
-2. Add the custom bucket (after uploading to GitHub):
+2. Add the custom bucket:
 
    ```powershell
-   scoop bucket add gyeongho-bucket https://github.com/gyeongho/scoop-bucket
+   scoop bucket add gyeongho https://github.com/GyeongHoKim/scoop-bucket
    ```
 
 3. Install the scripts:
