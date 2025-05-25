@@ -1,12 +1,19 @@
 # Simple test script
 Write-Host "Simple Test - Loading scripts..." -ForegroundColor Yellow
 
+$FailureCount = 0
+
 # 스크립트 로드
 $scriptPath = Join-Path $PSScriptRoot "scripts"
 Get-ChildItem "$scriptPath\*.ps1" | ForEach-Object {
     Write-Host "Loading $($_.Name)..." -NoNewline
-    . $_.FullName
-    Write-Host " [OK]" -ForegroundColor Green
+    try {
+        . $_.FullName
+        Write-Host " [OK]" -ForegroundColor Green
+    } catch {
+        Write-Host " [FAILED]" -ForegroundColor Red
+        $script:FailureCount++
+    }
 }
 
 # 명령어 확인
@@ -16,6 +23,7 @@ Write-Host "`nChecking available commands:" -ForegroundColor Yellow
         Write-Host "  ✓ $_" -ForegroundColor Green
     } else {
         Write-Host "  ✗ $_" -ForegroundColor Red
+        $script:FailureCount++
     }
 }
 
@@ -33,9 +41,11 @@ try {
         Write-Host "  ✓ touch: file created successfully" -ForegroundColor Green
     } else {
         Write-Host "  ✗ touch: file creation failed" -ForegroundColor Red
+        $script:FailureCount++
     }
 } catch {
     Write-Host "  ✗ touch: error occurred ($_)." -ForegroundColor Red
+    $script:FailureCount++
 }
 
 # echo to add content
@@ -48,9 +58,11 @@ try {
         Write-Host "  ✓ grep: working properly" -ForegroundColor Green
     } else {
         Write-Host "  ✗ grep: unexpected result" -ForegroundColor Red
+        $script:FailureCount++
     }
 } catch {
     Write-Host "  ✗ grep: error occurred ($_)." -ForegroundColor Red
+    $script:FailureCount++
 }
 
 # head test
@@ -60,9 +72,11 @@ try {
         Write-Host "  ✓ head: working properly" -ForegroundColor Green
     } else {
         Write-Host "  ✗ head: unexpected result" -ForegroundColor Red
+        $script:FailureCount++
     }
 } catch {
     Write-Host "  ✗ head: error occurred ($_)." -ForegroundColor Red
+    $script:FailureCount++
 }
 
 # tail test
@@ -72,9 +86,11 @@ try {
         Write-Host "  ✓ tail: working properly" -ForegroundColor Green
     } else {
         Write-Host "  ✗ tail: unexpected result" -ForegroundColor Red
+        $script:FailureCount++
     }
 } catch {
     Write-Host "  ✗ tail: error occurred ($_)." -ForegroundColor Red
+    $script:FailureCount++
 }
 
 # du test
@@ -84,9 +100,11 @@ try {
         Write-Host "  ✓ du: working properly" -ForegroundColor Green
     } else {
         Write-Host "  ✗ du: no result" -ForegroundColor Red
+        $script:FailureCount++
     }
 } catch {
     Write-Host "  ✗ du: error occurred ($_)." -ForegroundColor Red
+    $script:FailureCount++
 }
 
 # ln test (symbolic link)
@@ -96,9 +114,11 @@ try {
         Write-Host "  ✓ ln: symbolic link created successfully" -ForegroundColor Green
     } else {
         Write-Host "  ✗ ln: symbolic link creation failed" -ForegroundColor Red
+        $script:FailureCount++
     }
 } catch {
     Write-Host "  ✗ ln: error occurred ($_)." -ForegroundColor Red
+    $script:FailureCount++
 }
 
 # which test
@@ -108,9 +128,11 @@ try {
         Write-Host "  ✓ which: working properly ($whichResult)" -ForegroundColor Green
     } else {
         Write-Host "  ✗ which: no result" -ForegroundColor Red
+        $script:FailureCount++
     }
 } catch {
     Write-Host "  ✗ which: error occurred ($_)." -ForegroundColor Red
+    $script:FailureCount++
 }
 
 # rm test
@@ -120,12 +142,21 @@ try {
         Write-Host "  ✓ rm: file deleted successfully" -ForegroundColor Green
     } else {
         Write-Host "  ✗ rm: file deletion failed" -ForegroundColor Red
+        $script:FailureCount++
     }
     if (Test-Path $testLink) { rm $testLink }
 } catch {
     Write-Host "  ✗ rm: error occurred ($_)." -ForegroundColor Red
+    $script:FailureCount++
 }
 
 Write-Host "`nCommand execution tests completed!" -ForegroundColor Green
 
-Write-Host "`nTest completed!" -ForegroundColor Green
+Write-Host "`nTest Summary:" -ForegroundColor Yellow
+if ($FailureCount -eq 0) {
+    Write-Host "✓ All tests passed!" -ForegroundColor Green
+    exit 0
+} else {
+    Write-Host "✗ $FailureCount test(s) failed!" -ForegroundColor Red
+    exit 1
+}
