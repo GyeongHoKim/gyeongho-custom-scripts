@@ -17,13 +17,9 @@ jobs:
         run: |
           Write-Host "Running PowerShell script tests..." -ForegroundColor Yellow
           .\test.ps1
-
-      - name: Check Test Results
-        shell: pwsh
-        run: |
           if ($LASTEXITCODE -ne 0) {
             Write-Error "Tests failed with exit code $LASTEXITCODE"
-            exit 1
+            exit $LASTEXITCODE
           }
-          Write-Host "All tests passed!" -ForegroundColor Green
+          Write-Host "All tests completed successfully!" -ForegroundColor Green
 
